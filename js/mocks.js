@@ -1,19 +1,14 @@
-import {getRandomNumber, getRandomCoordinate} from './utils.js';
+import {getRandomNumber, getRandomCoordinate, getRandomArrayElement} from './utils.js';
+const OBJECT_COUNT = 10;
 
-const HOUSING_TYPE = [
+const HOUSING_TYPES = [
   'palace',
   'flat',
   'house',
   'bungalow',
 ];
 
-const CHECKIN_TIME = [
-  '12:00',
-  '13:00',
-  '14:00',
-];
-
-const CHECKOUT_TIME = [
+const CHECK_IN_OUT_HOURS = [
   '12:00',
   '13:00',
   '14:00',
@@ -34,7 +29,7 @@ const PICTURES = [
   'http://o0.github.io/assets/images/tokyo/hotel3.jpg',
 ];
 
-const TEXT = `Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+const SENTENCES = `Lorem ipsum dolor sit amet, consectetur adipiscing elit.
 Integer nec odio.
 Praesent libero.
 Sed cursus ante dapibus diam.
@@ -61,10 +56,6 @@ Quisque volutpat condimentum velit.
 Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos.
 Nam nec ante.`.split('.').filter(Boolean);
 
-const getRandomArrayElement = (elements) => {
-  return elements[getRandomNumber(0, elements.length - 1)];
-};
-
 const getRandomAuthor = () => {
   return {
     avatar: `../img/avatars/user0${getRandomNumber(1, 8)}`,
@@ -82,36 +73,39 @@ const getRandomPicture = () => {
   return `http://o0.github.io/assets/images/tokyo/hotel${getRandomNumber(1, PICTURES.length)}.jpg`;
 };
 
-const arrayOf = (n) => {
+const getArrayOf = (n) => {
   return new Array(getRandomNumber(1, n)).fill('');
 }
 
-const uniqueValues = (values) => {
+const getUniqueValues = (values) => {
   return Array.from(new Set(values));
 }
 
 const createRandomOffer = () => {
+  const randomHour = getRandomArrayElement(CHECK_IN_OUT_HOURS);
   return {
-    title: getRandomArrayElement(TEXT),
+    title: getRandomArrayElement(SENTENCES),
     address: `${getRandomLocation().x}, ${getRandomLocation().y}`,
     price: getRandomNumber(70, 500),
-    type: getRandomArrayElement(HOUSING_TYPE),
+    type: getRandomArrayElement(HOUSING_TYPES),
     rooms: getRandomNumber(1, 4),
     guests: getRandomNumber(1, 8),
-    checkin: getRandomArrayElement(CHECKIN_TIME),
-    checkout: getRandomArrayElement(CHECKOUT_TIME),
-    features: uniqueValues(arrayOf(FACILITIES.length).map(() => getRandomArrayElement(FACILITIES))),
-    description: getRandomArrayElement(TEXT),
-    photos: uniqueValues(arrayOf(PICTURES.length).map(getRandomPicture)),
+    checkin: randomHour,
+    checkout: randomHour,
+    features: getUniqueValues(getArrayOf(FACILITIES.length).map(() => getRandomArrayElement(FACILITIES))),
+    description: getRandomArrayElement(SENTENCES),
+    photos: getUniqueValues(getArrayOf(PICTURES.length).map(getRandomPicture)),
   }
 };
 
-try {
-  Array.from({length: 10}, () => ({
-    author: getRandomAuthor(),
-    offer: createRandomOffer(),
-    location: getRandomLocation(),
-  }));
-} catch (error) {
-  throw new Error(error);
+export const getAdvertisements = () => {
+  try {
+    return Array.from({length: OBJECT_COUNT}, () => ({
+      author: getRandomAuthor(),
+      offer: createRandomOffer(),
+      location: getRandomLocation(),
+    }));
+  } catch (error) {
+    throw new Error(error);
+  }
 }

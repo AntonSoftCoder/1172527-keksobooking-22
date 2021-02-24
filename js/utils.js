@@ -1,6 +1,6 @@
 const MAX_FLOAT_PRECISION = Math.pow(10, 17);
 
-export function getRandomNumber(from, to) {
+export const getRandomNumber = (from, to) => {
   let fromInt = Number(from);
   let toInt = Number(to);
   if (fromInt < 0 || toInt < 0 || !Number.isInteger(fromInt) || !Number.isInteger(toInt)) {
@@ -18,7 +18,7 @@ export function getRandomNumber(from, to) {
   return fromInt + Math.floor(Math.random()*(toInt - fromInt + 1));
 }
 
-export function getRandomCoordinate(from, to, floatPoints) {
+export const getRandomCoordinate = (from, to, floatPoints) => {
   if (from < 0 || to < 0 || isNaN(from) || isNaN(to)) {
     throw new Error(`from = ${from}, to = ${to} must make a positive range`);
   }
@@ -33,3 +33,7 @@ export function getRandomCoordinate(from, to, floatPoints) {
 
   return Number(result.toFixed(floatPoints));
 }
+
+export const getRandomArrayElement = (elements) => {
+  return elements[getRandomNumber(0, elements.length - 1)];
+};
