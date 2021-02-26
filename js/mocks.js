@@ -99,13 +99,13 @@ const createRandomOffer = () => {
 };
 
 export const getAdvertisements = () => {
-  try {
-    return Array.from({length: OBJECT_COUNT}, () => ({
+  const mockArrayObjects = [];
+  for (let i = 0; i < OBJECT_COUNT; i++) {
+    mockArrayObjects.push({
       author: getRandomAuthor(),
       offer: createRandomOffer(),
       location: getRandomLocation(),
-    }));
-  } catch (error) {
-    throw new Error(error);
+    });
   }
+  return mockArrayObjects;
 }

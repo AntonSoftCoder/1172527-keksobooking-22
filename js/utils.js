@@ -1,4 +1,6 @@
-const MAX_FLOAT_PRECISION = Math.pow(10, 17);
+const floatPrecision = (floatPoints) => {
+  return Math.pow(10, floatPoints);
+};
 
 export const getRandomNumber = (from, to) => {
   let fromInt = Number(from);
@@ -27,9 +29,9 @@ export const getRandomCoordinate = (from, to, floatPoints) => {
     throw new Error(`floatPoints = ${floatPoints} must be a non-negative integer`);
   }
 
-  const fromInt = from * MAX_FLOAT_PRECISION;
-  const toInt = to * MAX_FLOAT_PRECISION;
-  const result = getRandomNumber(fromInt, toInt) / MAX_FLOAT_PRECISION;
+  const fromInt = Math.round(from * floatPrecision(floatPoints));
+  const toInt = Math.round(to * floatPrecision(floatPoints));
+  const result = getRandomNumber(fromInt, toInt) / floatPrecision(floatPoints);
 
   return Number(result.toFixed(floatPoints));
 }
