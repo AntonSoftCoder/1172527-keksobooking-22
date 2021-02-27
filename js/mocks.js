@@ -1,27 +1,6 @@
 import {getRandomNumber, getRandomCoordinate, getRandomArrayElement} from './utils.js';
+import {CHECK_IN_OUT_HOURS, FACILITIES, APARTMENT_TYPES} from './constants.js'
 const OBJECT_COUNT = 10;
-
-const HOUSING_TYPES = [
-  'palace',
-  'flat',
-  'house',
-  'bungalow',
-];
-
-const CHECK_IN_OUT_HOURS = [
-  '12:00',
-  '13:00',
-  '14:00',
-];
-
-const FACILITIES = [
-  'wifi',
-  'dishwasher',
-  'parking',
-  'washer',
-  'elevator',
-  'conditioner',
-];
 
 const PICTURES = [
   'http://o0.github.io/assets/images/tokyo/hotel1.jpg',
@@ -58,7 +37,7 @@ Nam nec ante.`.split('.').filter(Boolean);
 
 const getRandomAuthor = () => {
   return {
-    avatar: `../img/avatars/user0${getRandomNumber(1, 8)}`,
+    avatar: `img/avatars/user0${getRandomNumber(1, 8)}.png`,
   }
 };
 
@@ -87,7 +66,7 @@ const createRandomOffer = () => {
     title: getRandomArrayElement(SENTENCES),
     address: `${getRandomLocation().x}, ${getRandomLocation().y}`,
     price: getRandomNumber(70, 500),
-    type: getRandomArrayElement(HOUSING_TYPES),
+    type: getRandomArrayElement(Object.keys(APARTMENT_TYPES)),
     rooms: getRandomNumber(1, 4),
     guests: getRandomNumber(1, 8),
     checkin: randomHour,
@@ -96,7 +75,7 @@ const createRandomOffer = () => {
     description: getRandomArrayElement(SENTENCES),
     photos: getUniqueValues(getArrayOf(PICTURES.length).map(getRandomPicture)),
   }
-};
+}
 
 export const getAdvertisements = () => {
   const mockArrayObjects = [];
@@ -109,3 +88,5 @@ export const getAdvertisements = () => {
   }
   return mockArrayObjects;
 }
+
+
