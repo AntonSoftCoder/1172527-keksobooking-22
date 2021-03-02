@@ -32,18 +32,3 @@ export const GUEST_VARIANTS = [
   'гостей',
 ];
 
-export const pluralize = (count, variants) => {
-  const restOfHundred = count % 100;
-  const restOfTen = count % 10;
-
-  if (restOfHundred > 10 && restOfHundred < 20)
-    return variants[2];
-  if (restOfTen > 1 && restOfTen < 5)
-    return variants[1];
-  if (restOfTen === 1)
-    return variants[0];
-
-  return variants[2];
-};
-
-

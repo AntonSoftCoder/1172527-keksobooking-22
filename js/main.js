@@ -1,4 +1,4 @@
-import { renderAdvert } from './adverts.js';
-import { getAdvertisements } from './mocks.js';
-renderAdvert(getAdvertisements()[0]);
+import { renderCard } from './card.js';
+import { getCard } from './mocks.js';
+renderCard(getCard()[0]);
 

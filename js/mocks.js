@@ -1,6 +1,9 @@
 import {getRandomNumber, getRandomCoordinate, getRandomArrayElement} from './utils.js';
 import {CHECK_IN_OUT_HOURS, FACILITIES, APARTMENT_TYPES} from './constants.js'
+
 const OBJECT_COUNT = 10;
+const MIN_VALUE = 1;
+const MAX_VALUE = 8;
 
 const PICTURES = [
   'http://o0.github.io/assets/images/tokyo/hotel1.jpg',
@@ -37,23 +40,26 @@ Nam nec ante.`.split('.').filter(Boolean);
 
 const getRandomAuthor = () => {
   return {
-    avatar: `img/avatars/user0${getRandomNumber(1, 8)}.png`,
+    avatar: `img/avatars/user0${getRandomNumber(MIN_VALUE, MAX_VALUE)}.png`,
   }
 };
 
+const longitude = getRandomCoordinate(139.70000, 139.80000, 5);
+const latitude = getRandomCoordinate(35.65000, 35.70000, 5);
+
 const getRandomLocation = () => {
   return {
-    x: getRandomCoordinate(35.65000, 35.70000, 5),
-    y: getRandomCoordinate(139.70000, 139.80000, 5),
+    x: latitude,
+    y: longitude,
   }
 };
 
 const getRandomPicture = () => {
-  return `http://o0.github.io/assets/images/tokyo/hotel${getRandomNumber(1, PICTURES.length)}.jpg`;
+  return `http://o0.github.io/assets/images/tokyo/hotel${getRandomNumber(MIN_VALUE, PICTURES.length)}.jpg`;
 };
 
 const getArrayOf = (n) => {
-  return new Array(getRandomNumber(1, n)).fill('');
+  return new Array(getRandomNumber(MIN_VALUE, n)).fill('');
 }
 
 const getUniqueValues = (values) => {
@@ -65,10 +71,10 @@ const createRandomOffer = () => {
   return {
     title: getRandomArrayElement(SENTENCES),
     address: `${getRandomLocation().x}, ${getRandomLocation().y}`,
-    price: getRandomNumber(70, 500),
+    price: getRandomNumber(MIN_VALUE * 100, MAX_VALUE * 100),
     type: getRandomArrayElement(Object.keys(APARTMENT_TYPES)),
-    rooms: getRandomNumber(1, 4),
-    guests: getRandomNumber(1, 8),
+    rooms: getRandomNumber(MIN_VALUE, MAX_VALUE),
+    guests: getRandomNumber(MIN_VALUE, MAX_VALUE),
     checkin: randomHour,
     checkout: randomHour,
     features: getUniqueValues(getArrayOf(FACILITIES.length).map(() => getRandomArrayElement(FACILITIES))),
@@ -77,7 +83,7 @@ const createRandomOffer = () => {
   }
 }
 
-export const getAdvertisements = () => {
+export const getCard = () => {
   const mockArrayObjects = [];
   for (let i = 0; i < OBJECT_COUNT; i++) {
     mockArrayObjects.push({
