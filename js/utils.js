@@ -1,4 +1,4 @@
-const floatPrecision = (floatPoints) => {
+const getFloatPrecision = (floatPoints) => {
   return Math.pow(10, floatPoints);
 };
 
@@ -29,13 +29,27 @@ export const getRandomCoordinate = (from, to, floatPoints) => {
     throw new Error(`floatPoints = ${floatPoints} must be a non-negative integer`);
   }
 
-  const fromInt = Math.round(from * floatPrecision(floatPoints));
-  const toInt = Math.round(to * floatPrecision(floatPoints));
-  const result = getRandomNumber(fromInt, toInt) / floatPrecision(floatPoints);
+  const fromInt = Math.round(from * getFloatPrecision(floatPoints));
+  const toInt = Math.round(to * getFloatPrecision(floatPoints));
+  const result = getRandomNumber(fromInt, toInt) / getFloatPrecision(floatPoints);
 
   return Number(result.toFixed(floatPoints));
 }
 
 export const getRandomArrayElement = (elements) => {
   return elements[getRandomNumber(0, elements.length - 1)];
+};
+
+export const pluralize = (count, variants) => {
+  const restOfHundred = count % 100;
+  const restOfTen = count % 10;
+
+  if (restOfHundred > 10 && restOfHundred < 20)
+    return variants[2];
+  if (restOfTen > 1 && restOfTen < 5)
+    return variants[1];
+  if (restOfTen === 1)
+    return variants[0];
+
+  return variants[2];
 };
