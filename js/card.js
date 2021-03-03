@@ -1,12 +1,9 @@
-import { APARTMENT_TYPES, ROOM_VARIANTS, GUEST_VARIANTS, FACILITIES } from './constants.js';
+import { apartmentTypes, ROOM_VARIANTS, GUEST_VARIANTS, FACILITIES } from './constants.js';
 import { pluralize } from './utils.js';
 
-const CARD_POPUP = document.querySelector('#card')
+const CARD_POPUP_NODE = document.querySelector('#card')
   .content
   .querySelector('.popup');
-
-const MAP_CANVAS = document.querySelector('.map__canvas');
-
 
 const getRoomCapacity = (rooms, guests) => {
   return `${rooms} ${pluralize(rooms, ROOM_VARIANTS)} для ${guests} ${pluralize(guests, GUEST_VARIANTS)}`;
@@ -43,13 +40,11 @@ const createPictures = (card, urls) => {
   }
 };
 
-const createCard = (advert) => {
-
-  const cardListFragment = document.createDocumentFragment();
+export const createCard = (advert) => {
 
   const {author, offer} = advert;
   const {title, address, price, type, rooms, guests, checkin, checkout, features, description, photos} = offer;
-  const card = CARD_POPUP.cloneNode(true);
+  const card = CARD_POPUP_NODE.cloneNode(true);
 
   const avatarNode = card.querySelector('.popup__avatar');
   if (author && author.avatar) {
@@ -81,7 +76,7 @@ const createCard = (advert) => {
 
   const typeNode = card.querySelector('.popup__type');
   if (type) {
-    typeNode.textContent = APARTMENT_TYPES[type];
+    typeNode.textContent = apartmentTypes[type];
   } else {
     typeNode.remove();
   }
@@ -111,10 +106,5 @@ const createCard = (advert) => {
 
   createPictures(card, photos);
 
-  cardListFragment.appendChild(card);
-  return cardListFragment;
+  return card;
 };
-
-export const renderCard = (advert) => {
-  MAP_CANVAS.appendChild(createCard(advert));
-}

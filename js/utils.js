@@ -1,3 +1,5 @@
+import { LOCATION_PRECISION } from './constants.js';
+
 const getFloatPrecision = (floatPoints) => {
   return Math.pow(10, floatPoints);
 };
@@ -41,8 +43,8 @@ export const getRandomArrayElement = (elements) => {
 };
 
 export const pluralize = (count, variants) => {
-  const restOfHundred = count % 100;
-  const restOfTen = count % 10;
+  const restOfHundred = Math.abs(count % 100);
+  const restOfTen = Math.abs(count % 10);
 
   if (restOfHundred > 10 && restOfHundred < 20)
     return variants[2];
@@ -53,3 +55,7 @@ export const pluralize = (count, variants) => {
 
   return variants[2];
 };
+
+export const getLocationAsString = ({lat, lng}) => {
+  return `${lat.toFixed(LOCATION_PRECISION)}, ${lng.toFixed(LOCATION_PRECISION)}`;
+}
