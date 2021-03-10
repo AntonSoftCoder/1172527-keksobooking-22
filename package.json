@@ -23,5 +23,10 @@
   },
   "engines": {
     "node": ">=12.0.0"
+  },
+  "eslintConfig": {
+    "globals": {
+      "L": true
+    }
   }
 }

@@ -1,4 +1,5 @@
-import { renderCard } from './card.js';
-import { getCard } from './mocks.js';
-renderCard(getCard()[0]);
+import { createMainMarker, createMap, createPopupMarkers } from './map.js';
 
+const map = createMap();
+createPopupMarkers(map);
+createMainMarker(map);

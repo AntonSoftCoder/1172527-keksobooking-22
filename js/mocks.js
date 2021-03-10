@@ -1,9 +1,22 @@
 import {getRandomNumber, getRandomCoordinate, getRandomArrayElement} from './utils.js';
-import {CHECK_IN_OUT_HOURS, FACILITIES, APARTMENT_TYPES} from './constants.js'
+import {CHECK_IN_OUT_HOURS, FACILITIES, apartmentTypes, LOCATION_PRECISION} from './constants.js'
 
 const OBJECT_COUNT = 10;
-const MIN_VALUE = 1;
-const MAX_VALUE = 8;
+
+const VALUE = {
+  MIN: 1,
+  MAX: 8,
+}
+
+const LAT = {
+  MIN: 35.65000,
+  MAX: 35.70000,
+}
+
+const LNG = {
+  MIN: 139.70000,
+  MAX: 139.80000,
+}
 
 const PICTURES = [
   'http://o0.github.io/assets/images/tokyo/hotel1.jpg',
@@ -39,42 +52,39 @@ Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos
 Nam nec ante.`.split('.').filter(Boolean);
 
 const getRandomAuthor = () => {
+  const numberAsString = `${getRandomNumber(VALUE.MIN, VALUE.MAX)}`;
+
   return {
-    avatar: `img/avatars/user0${getRandomNumber(MIN_VALUE, MAX_VALUE)}.png`,
+    avatar: `img/avatars/user${numberAsString.padStart(2, '0')}.png`,
   }
 };
 
-const longitude = getRandomCoordinate(139.70000, 139.80000, 5);
-const latitude = getRandomCoordinate(35.65000, 35.70000, 5);
-
-const getRandomLocation = () => {
-  return {
-    x: latitude,
-    y: longitude,
-  }
-};
+const getRandomLocation = () => ({
+  x: getRandomCoordinate(LAT.MIN, LAT.MAX, LOCATION_PRECISION),
+  y: getRandomCoordinate(LNG.MIN, LNG.MAX, LOCATION_PRECISION),
+});
 
 const getRandomPicture = () => {
-  return `http://o0.github.io/assets/images/tokyo/hotel${getRandomNumber(MIN_VALUE, PICTURES.length)}.jpg`;
+  return `http://o0.github.io/assets/images/tokyo/hotel${getRandomNumber(VALUE.MIN, PICTURES.length)}.jpg`;
 };
 
 const getArrayOf = (n) => {
-  return new Array(getRandomNumber(MIN_VALUE, n)).fill('');
+  return new Array(getRandomNumber(VALUE.MIN, n)).fill('');
 }
 
 const getUniqueValues = (values) => {
   return Array.from(new Set(values));
 }
 
-const createRandomOffer = () => {
+const createRandomOffer = (location) => {
   const randomHour = getRandomArrayElement(CHECK_IN_OUT_HOURS);
   return {
     title: getRandomArrayElement(SENTENCES),
-    address: `${getRandomLocation().x}, ${getRandomLocation().y}`,
-    price: getRandomNumber(MIN_VALUE * 100, MAX_VALUE * 100),
-    type: getRandomArrayElement(Object.keys(APARTMENT_TYPES)),
-    rooms: getRandomNumber(MIN_VALUE, MAX_VALUE),
-    guests: getRandomNumber(MIN_VALUE, MAX_VALUE),
+    address: `${location.x}, ${location.y}`,
+    price: getRandomNumber(VALUE.MIN * 100, VALUE.MAX * 100),
+    type: getRandomArrayElement(Object.keys(apartmentTypes)),
+    rooms: getRandomNumber(VALUE.MIN, VALUE.MAX),
+    guests: getRandomNumber(VALUE.MIN, VALUE.MAX),
     checkin: randomHour,
     checkout: randomHour,
     features: getUniqueValues(getArrayOf(FACILITIES.length).map(() => getRandomArrayElement(FACILITIES))),
@@ -83,16 +93,15 @@ const createRandomOffer = () => {
   }
 }
 
-export const getCard = () => {
+export const getCards = () => {
   const mockArrayObjects = [];
   for (let i = 0; i < OBJECT_COUNT; i++) {
+    const location = getRandomLocation();
     mockArrayObjects.push({
       author: getRandomAuthor(),
-      offer: createRandomOffer(),
-      location: getRandomLocation(),
+      offer: createRandomOffer(location),
+      location,
     });
   }
   return mockArrayObjects;
 }
-
-
