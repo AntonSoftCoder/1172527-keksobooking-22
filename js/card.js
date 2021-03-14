@@ -40,55 +40,54 @@ const createPictures = (card, urls) => {
   }
 };
 
+const createCardField = (node, content) => {
+  if (content) {
+    node.textContent = content;
+  } else {
+    node.remove();
+  }
+}
+
 export const createCard = (advert) => {
 
-  const {author, offer} = advert;
-  const {title, address, price, type, rooms, guests, checkin, checkout, features, description, photos} = offer;
+  const { author, offer } = advert;
+  const { title, address, price, type, rooms, guests, checkin, checkout, features, description, photos } = offer;
+
   const card = CARD_POPUP_NODE.cloneNode(true);
 
+  const titleNode = card.querySelector('.popup__title');
+  const addressNode =  card.querySelector('.popup__text--address');
+  const priceNode = card.querySelector('.popup__text--price');
+  const typeNode = card.querySelector('.popup__type');
+  const capacityNode = card.querySelector('.popup__text--capacity');
+  const timeNode = card.querySelector('.popup__text--time');
+  const descriptionNode = card.querySelector('.popup__description');
   const avatarNode = card.querySelector('.popup__avatar');
+
   if (author && author.avatar) {
     avatarNode.src = author.avatar;
   } else {
     avatarNode.remove();
   }
 
-  const titleNode = card.querySelector('.popup__title');
-  if (title) {
-    titleNode.textContent = title;
-  } else {
-    titleNode.remove();
-  }
+  createCardField(titleNode, title);
 
-  const addressNode = card.querySelector('.popup__text--address');
-  if (address) {
-    addressNode.textContent = address;
-  } else {
-    addressNode.remove();
-  }
+  createCardField(addressNode, address);
 
-  const priceNode = card.querySelector('.popup__text--price');
   if (price) {
     priceNode.childNodes[0].nodeValue = `${price} `;
   } else {
     priceNode.remove();
   }
 
-  const typeNode = card.querySelector('.popup__type');
-  if (type) {
-    typeNode.textContent = apartmentTypes[type];
-  } else {
-    typeNode.remove();
-  }
+  createCardField(typeNode, apartmentTypes[type]);
 
-  const capacityNode = card.querySelector('.popup__text--capacity');
   if (rooms && guests) {
     capacityNode.textContent = getRoomCapacity(rooms, guests);
   } else {
     capacityNode.remove();
   }
 
-  const timeNode = card.querySelector('.popup__text--time');
   if (checkin && checkout) {
     timeNode.textContent = `Заезд после ${checkin}, выезд до ${checkout}`;
   } else {
@@ -97,12 +96,7 @@ export const createCard = (advert) => {
 
   createFeatures(card, features);
 
-  const descriptionNode = card.querySelector('.popup__description');
-  if (description) {
-    descriptionNode.textContent = description;
-  } else {
-    descriptionNode.remove();
-  }
+  createCardField(descriptionNode, description);
 
   createPictures(card, photos);
 

@@ -1,5 +1,3 @@
-import { LOCATION_PRECISION } from './constants.js';
-
 const getFloatPrecision = (floatPoints) => {
   return Math.pow(10, floatPoints);
 };
@@ -56,6 +54,13 @@ export const pluralize = (count, variants) => {
   return variants[2];
 };
 
-export const getLocationAsString = ({lat, lng}) => {
-  return `${lat.toFixed(LOCATION_PRECISION)}, ${lng.toFixed(LOCATION_PRECISION)}`;
+export const getLocationAsString = ({lat, lng}, locationPrecision) => {
+  return `${lat.toFixed(locationPrecision)}, ${lng.toFixed(locationPrecision)}`;
+}
+
+export const getPointAsLocation = ({x, y}) => {
+  return {
+    lat: x,
+    lng: y,
+  };
 }
