@@ -44,6 +44,12 @@ export const TOKYO_CENTER = {
   y: 139.75555,
 }
 
+export const TITLE_LENGTH = {
+  MIN: 30,
+  MAX: 100,
+}
+
 export const LOCATION_PRECISION = 5;
 export const ICON_SIZE = 40;
 export const MAIN_ICON_SIZE = 60;
+export const MAX_HOUSING_PRICE = 1000000;
