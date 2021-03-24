@@ -40,7 +40,7 @@ const createPictures = (card, urls) => {
   }
 };
 
-const createCardField = (node, content) => {
+const setOrRemoveCardField = (node, content) => {
   if (content) {
     node.textContent = content;
   } else {
@@ -48,7 +48,7 @@ const createCardField = (node, content) => {
   }
 }
 
-export const createCard = (advert) => {
+const createCard = (advert) => {
 
   const { author, offer } = advert;
   const { title, address, price, type, rooms, guests, checkin, checkout, features, description, photos } = offer;
@@ -70,9 +70,9 @@ export const createCard = (advert) => {
     avatarNode.remove();
   }
 
-  createCardField(titleNode, title);
+  setOrRemoveCardField(titleNode, title);
 
-  createCardField(addressNode, address);
+  setOrRemoveCardField(addressNode, address);
 
   if (price) {
     priceNode.childNodes[0].nodeValue = `${price} `;
@@ -80,7 +80,7 @@ export const createCard = (advert) => {
     priceNode.remove();
   }
 
-  createCardField(typeNode, apartmentTypes[type]);
+  setOrRemoveCardField(typeNode, apartmentTypes[type]);
 
   if (rooms && guests) {
     capacityNode.textContent = getRoomCapacity(rooms, guests);
@@ -96,9 +96,11 @@ export const createCard = (advert) => {
 
   createFeatures(card, features);
 
-  createCardField(descriptionNode, description);
+  setOrRemoveCardField(descriptionNode, description);
 
   createPictures(card, photos);
 
   return card;
 };
+
+export { createCard };
