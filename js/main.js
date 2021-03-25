@@ -1,15 +1,14 @@
-import { setAddress, addEventsFormHandler } from './form-ad.js';
-import { createMainMarker, createMap, createPopupMarkers } from './map.js';
-import { getCards } from './mocks.js';
+import { loadData, sendData } from './api.js';
 import { createCard } from './card.js';
-import { toggleFormAdMapFilters } from './form-ad.js';
+import { ServerUrl, Messages } from './constants.js';
+import { setAddress, addEventsFormHandler, showLoadDataAlert, onSuccess, showAlert, AlertType } from './form-ad.js';
+import { toggleFormAdMapFilters, addSubmitHandler } from './form-ad.js';
+import { createPopupMarkers, initMap } from './map.js';
 
-const moveMarkerHandler = (evt) => {
-  setAddress(evt.target.getLatLng());
-}
+const map = initMap(toggleFormAdMapFilters, setAddress);
 
-const map = createMap(toggleFormAdMapFilters);
-createPopupMarkers(map, getCards(), createCard);
-createMainMarker(map, moveMarkerHandler, setAddress);
+loadData(ServerUrl.GET, createPopupMarkers(map, createCard), showLoadDataAlert(Messages.loadError));
 
 addEventsFormHandler();
+
+addSubmitHandler(sendData(ServerUrl.POST, onSuccess(Messages.sendSuccess), showAlert(AlertType.ERROR, Messages.sendError)));

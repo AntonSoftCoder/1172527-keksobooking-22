@@ -40,13 +40,25 @@ export const GUEST_VARIANTS = [
 ];
 
 export const TOKYO_CENTER = {
-  x: 35.68355,
-  y: 139.75555,
+  lat: 35.68355,
+  lng: 139.75555,
 }
 
 export const TITLE_LENGTH = {
   MIN: 30,
   MAX: 100,
+}
+
+export const ServerUrl = {
+  GET: 'https://22.javascript.pages.academy/keksobooking/data',
+  POST: 'https://22.javascript.pages.academy/keksobooking',
+}
+
+export const Messages = {
+  loadSuccess: 'Данные загружены правильно',
+  loadError: 'Ошибка загрузки данных',
+  sendSuccess: 'Объявление размещено успешно!',
+  sendError: 'Ошибка размещения объявления',
 }
 
 export const LOCATION_PRECISION = 5;
