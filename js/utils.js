@@ -27,4 +27,9 @@ const isEscEvent = (evt) => {
   return evt.key === 'Escape' || evt.key === 'Esc';
 }
 
-export { pluralize, getLocationAsString, getPointAsLocation, isEscEvent };
+const toggleElements = (container, fieldNodes, isShown) => {
+  container.classList.toggle('ad-form--disabled', !isShown);
+  fieldNodes.forEach( el => el.disabled = !isShown );
+}
+
+export { pluralize, getLocationAsString, getPointAsLocation, isEscEvent, toggleElements };

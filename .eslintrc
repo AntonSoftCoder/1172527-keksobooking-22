@@ -13,3 +13,4 @@ extends:
 
 globals:
   L: true
+  _: true

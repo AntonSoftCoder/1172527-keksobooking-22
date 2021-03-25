@@ -54,7 +54,7 @@ export const ServerUrl = {
   POST: 'https://22.javascript.pages.academy/keksobooking',
 }
 
-export const Messages = {
+export const messages = {
   loadSuccess: 'Данные загружены правильно',
   loadError: 'Ошибка загрузки данных',
   sendSuccess: 'Объявление размещено успешно!',

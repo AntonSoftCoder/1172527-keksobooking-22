@@ -1,14 +1,29 @@
 import { loadData, sendData } from './api.js';
 import { createCard } from './card.js';
-import { ServerUrl, Messages } from './constants.js';
-import { setAddress, addEventsFormHandler, showLoadDataAlert, onSuccess, showAlert, AlertType } from './form-ad.js';
-import { toggleFormAdMapFilters, addSubmitHandler } from './form-ad.js';
-import { createPopupMarkers, initMap } from './map.js';
+import { ServerUrl, messages } from './constants.js';
+import { toggleForm, addSubmitHandler, resetForm, setAddress, addEventsFormHandler } from './form-ad.js';
+import { showLoadDataAlert, AlertType, showAlert, onSuccess } from './alert.js';
+import { toggleFilters, addEventsFilterHandler } from './filter.js';
+import { createPopupMarkers, filterPopupMarkers, initMap, resetMainMarker } from './map.js';
+import { getData, storeData } from './store.js';
 
-const map = initMap(toggleFormAdMapFilters, setAddress);
+toggleFilters(false)();
+toggleForm(false)();
+initMap(toggleForm(true), setAddress);
 
-loadData(ServerUrl.GET, createPopupMarkers(map, createCard), showLoadDataAlert(Messages.loadError));
+const onLoadDataSuccess = (cards) => {
+  storeData(cards);
+  createPopupMarkers(createCard)(cards);
+  toggleFilters(true)();
+  addEventsFilterHandler(filterPopupMarkers(createCard, getData));
+}
 
-addEventsFormHandler();
+loadData(ServerUrl.GET, onLoadDataSuccess, showLoadDataAlert(messages.loadError));
 
-addSubmitHandler(sendData(ServerUrl.POST, onSuccess(Messages.sendSuccess), showAlert(AlertType.ERROR, Messages.sendError)));
+addEventsFormHandler(resetMainMarker);
+
+addSubmitHandler(sendData(ServerUrl.POST, onSuccess(messages.sendSuccess, resetForm(resetMainMarker)), showAlert(AlertType.ERROR, messages.sendError)));
+
+// document.querySelector('#address').addEventListener('reset', (evt) => {
+//   debugger;
+// });

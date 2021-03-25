@@ -7,6 +7,7 @@ const MAIN_ICON_URL = 'img/main-pin.svg';
 const MAP_ZOOM = 10;
 
 const MAP_CANVAS_NODE = document.querySelector('#map-canvas');
+let map = null;
 
 const createMapLayer = (tilesUrl, tilesCopyright) => {
   return L.tileLayer(
@@ -23,7 +24,12 @@ const createIcon = (url, iconSize) => {
   });
 };
 
-const createMarker = (point, icon, map) => {
+const ICON = createIcon(ICON_URL, ICON_SIZE);
+const MAIN_ICON = createIcon(MAIN_ICON_URL, MAIN_ICON_SIZE);
+let popupMarkers = [];
+let mainMarker = null;
+
+const createMarker = (point, icon) => {
   return L.marker(
     point,
     {
@@ -32,36 +38,44 @@ const createMarker = (point, icon, map) => {
     }).addTo(map);
 };
 
-const createMap = (loadMapHandler) => {
-  loadMapHandler(false);
-  const map = L.map(MAP_CANVAS_NODE)
-    .on('load', () => loadMapHandler(true))
+const createMap = (enableForm) => {
+  map = L.map(MAP_CANVAS_NODE)
+    .on('load', () => enableForm())
     .setView(TOKYO_CENTER, MAP_ZOOM);
-
   createMapLayer(TILES_URL, TILES_COPYRIGNT).addTo(map);
-  return map;
 }
 
-const createMainMarker = (map, setAddress) => {
+const resetMainMarker = () => {
+  mainMarker.setLatLng(TOKYO_CENTER);
+  map.panTo(TOKYO_CENTER);
+};
 
-  const mainIcon = createIcon(MAIN_ICON_URL, MAIN_ICON_SIZE);
-  const mainMarker = createMarker(TOKYO_CENTER, mainIcon, map);
+const createMainMarker = (setAddress) => {
+  mainMarker = createMarker(TOKYO_CENTER, MAIN_ICON);
   mainMarker.on('moveend', (evt) => { setAddress(evt.target.getLatLng()); });
   setAddress(TOKYO_CENTER);
 }
 
-const createPopupMarkers = (map,  createCard) => (cards) => {
-  const icon = createIcon(ICON_URL, ICON_SIZE);
+const removePopupMarkers = () => {
+  popupMarkers.forEach(marker => map.removeLayer(marker));
+}
+
+const createPopupMarkers = (createCard) => (cards) => {
   cards.forEach(card => {
-    const marker = createMarker(card.location, icon, map);
+    const marker = createMarker(card.location, ICON);
     marker.bindPopup(createCard(card), { keepInView: true });
+    popupMarkers.push(marker);
   });
 };
 
-const initMap = (toggleFormAdMapFilters, setAddress) => {
-  const map = createMap(toggleFormAdMapFilters);
-  createMainMarker(map, setAddress);
-  return map;
+const filterPopupMarkers = (createCard, getCards) => () => {
+  removePopupMarkers();
+  createPopupMarkers(createCard)(getCards());
 }
 
-export { initMap, createPopupMarkers };
+const initMap = (enableForm, setAddress) => {
+  createMap(enableForm);
+  createMainMarker(setAddress);
+}
+
+export { initMap, createPopupMarkers, filterPopupMarkers, resetMainMarker };

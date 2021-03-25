@@ -1,11 +1,7 @@
 import { LOCATION_PRECISION, minPriceByApart, TITLE_LENGTH, MAX_HOUSING_PRICE, TOKYO_CENTER} from './constants.js';
-import { getLocationAsString, isEscEvent } from './utils.js';
+import { getLocationAsString, toggleElements } from './utils.js';
 
 const FORM_CONTAINER = document.querySelector('.ad-form');
-const FORM_NODES = FORM_CONTAINER.querySelectorAll('.ad-form__element');
-const MAP_FILTERS_CONTAINER = document.querySelector('.map__filters');
-const MAP_FILTERS_NODES = MAP_FILTERS_CONTAINER.querySelectorAll('.map__filter');
-const MAP_FILTERS_FEATURES_NODE = MAP_FILTERS_CONTAINER.querySelector('.map__features');
 
 const FormNode = {
   HEADER: FORM_CONTAINER.querySelector('.ad-form-header'),
@@ -16,37 +12,18 @@ const FormNode = {
   CHECKOUT: FORM_CONTAINER.querySelector('#timeout'),
   TITLE: FORM_CONTAINER.querySelector('#title'),
   ROOM: FORM_CONTAINER.querySelector('#room_number'),
-  CAPACITY: FORM_CONTAINER.querySelector('#capacity'),
+  GUESTS: FORM_CONTAINER.querySelector('#capacity'),
   RESET_BUTTON: FORM_CONTAINER.querySelector('.ad-form__reset'),
 }
 
-const FORM_GUEST_OPTIONS = FormNode.CAPACITY.querySelectorAll('option');
-const FORM_MAP_FILTERS_CONTAINERS = [FORM_CONTAINER, MAP_FILTERS_CONTAINER];
-const NODES = [FormNode.HEADER, ...FORM_NODES, MAP_FILTERS_FEATURES_NODE, ...MAP_FILTERS_NODES];
+const FORM_FEATURE_NODES = FORM_CONTAINER.querySelectorAll('input[name=features]');
+const FORM_GUEST_OPTIONS = FormNode.GUESTS.querySelectorAll('option');
 
-const AlertNode = {
-  ERROR: document.querySelector('#error').content.querySelector('.error'),
-  SUCCESS: document.querySelector('#success').content.querySelector('.success'),
-}
-
-const AlertType = {
-  SUCCESS: {
-    popupNode: AlertNode.SUCCESS.cloneNode(true),
-    messageSelector: '.success__message',
-    color: 'green',
-  },
-
-  ERROR: {
-    popupNode: AlertNode.ERROR.cloneNode(true),
-    messageSelector: '.error__message',
-    color: 'red',
-  },
-}
-
-const toggleFormAdMapFilters = (isShown) => {
-
-  FORM_MAP_FILTERS_CONTAINERS.forEach( el => el.classList.toggle('ad-form--disabled', !isShown));
-  NODES.forEach( el => el.disabled = !isShown );
+const toggleForm = (isShown) => () => {
+  // setTimeout(() => {
+  toggleElements(FORM_CONTAINER, Object.values(FormNode), isShown);
+  toggleElements(FORM_CONTAINER, FORM_FEATURE_NODES, isShown);
+  // }, isShown ? 3000 : 0);
 }
 
 const setAddress = (location) => {
@@ -96,7 +73,7 @@ const validatePrice = () => {
 const adjustRoomGuests = () => {
 
   const roomCount = Number(FormNode.ROOM.value);
-  const selectedGuestOption = Number(FormNode.CAPACITY.value);
+  const selectedGuestOption = Number(FormNode.GUESTS.value);
 
   FORM_GUEST_OPTIONS.forEach((guestOption) => {
     const guestOptionValue = Number(guestOption.value);
@@ -107,10 +84,10 @@ const adjustRoomGuests = () => {
     }
     if (guestOptionValue === selectedGuestOption) {
       if (guestOption.disabled) {
-        FormNode.CAPACITY.setCustomValidity('Эта опция недоступна для выбранного варианта комнаты.');
-        FormNode.CAPACITY.reportValidity();
+        FormNode.GUESTS.setCustomValidity('Эта опция недоступна для выбранного варианта комнаты.');
+        FormNode.GUESTS.reportValidity();
       } else {
-        FormNode.CAPACITY.setCustomValidity('');
+        FormNode.GUESTS.setCustomValidity('');
       }
     }
   });
@@ -120,7 +97,7 @@ const clearValidation = (evt) => {
   evt.target.setCustomValidity('');
 }
 
-const addEventsFormHandler = () => {
+const addEventsFormHandler = (resetMainMarker) => {
 
   FormNode.CHECKIN.addEventListener('change', changeCheckOut);
   FormNode.CHECKOUT.addEventListener('change', changeCheckIn);
@@ -129,8 +106,8 @@ const addEventsFormHandler = () => {
   FormNode.TYPE.addEventListener('change', validatePrice);
   FormNode.PRICE.addEventListener('input', validatePrice);
   FormNode.ROOM.addEventListener('change', adjustRoomGuests);
-  FormNode.CAPACITY.addEventListener('change', clearValidation);
-  FormNode.RESET_BUTTON.addEventListener('click', resetForm);
+  FormNode.GUESTS.addEventListener('change', clearValidation);
+  FormNode.RESET_BUTTON.addEventListener('click', resetForm(resetMainMarker));
   adjustRoomGuests();
 }
 
@@ -143,72 +120,12 @@ const addSubmitHandler = (sendData) => {
   });
 }
 
-const resetForm = () => {
+const resetForm = (resetMainMarker) => (evt) => {
+  evt && evt.preventDefault();
   FORM_CONTAINER.reset();
-  setAddress(TOKYO_CENTER);
   adjustRoomGuests();
+  resetMainMarker();
+  setAddress(TOKYO_CENTER);
 }
 
-const showLoadDataAlert = (message) => () => {
-  const node = document.createElement('div');
-  node.style.zIndex = 1000;
-  node.style.position = 'fixed';
-  node.style.left = 0;
-  node.style.top = 0;
-  node.style.right = 0;
-  node.style.padding = '10px 3px';
-  node.style.fontSize = '30px';
-  node.style.textAlign = 'center';
-  node.style.backgroundColor = 'red';
-
-  node.textContent = message;
-
-  document.body.append(node);
-
-  setTimeout(() => {
-    node.remove();
-  }, 5000);
-}
-
-const showAlert = (alertType, message) => () => {
-  alertType.popupNode.style.zIndex = 1000;
-  const messageNode = alertType.popupNode.querySelector(alertType.messageSelector);
-  messageNode.style.backgroundColor = alertType.color;
-  messageNode.textContent = message;
-  document.body.append(alertType.popupNode);
-  addPopupClosingListener(alertType);
-}
-
-const closePopupByClickHandler = (alertType, timeoutId) => (evt) => {
-  closePopup(alertType, timeoutId, evt);
-};
-
-const closePopupByEscapeHandler = (alertType, timeoutId) => (evt) => {
-  if (isEscEvent(evt)) {
-    closePopup(alertType, timeoutId, evt);
-  }
-};
-
-const closePopup = (alertType, timeoutId) => {
-  alertType.popupNode.removeEventListener('click', closePopupByClickHandler(alertType, timeoutId));
-  alertType.popupNode.removeEventListener('keyup', closePopupByEscapeHandler(alertType, timeoutId));
-  alertType.popupNode.remove();
-  clearTimeout(timeoutId);
-  if (alertType === AlertType.SUCCESS) {
-    resetForm();
-  }
-}
-
-const addPopupClosingListener = (alertType) => {
-  const timeoutId = setTimeout(() => {
-    closePopup(alertType, timeoutId);
-  }, 5000);
-  alertType.popupNode.addEventListener('click', closePopupByClickHandler(alertType, timeoutId));
-  document.addEventListener('keyup', closePopupByEscapeHandler(alertType, timeoutId));
-}
-
-const onSuccess = (successMessage) => () => {
-  showAlert(AlertType.SUCCESS, successMessage)();
-}
-
-export { AlertType, toggleFormAdMapFilters, setAddress, addEventsFormHandler, addSubmitHandler, showLoadDataAlert, showAlert, onSuccess };
+export { toggleForm, resetForm, setAddress, addEventsFormHandler, addSubmitHandler };
