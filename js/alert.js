@@ -1,5 +1,12 @@
 import { isEscEvent } from './utils.js';
 
+const Messages = {
+  LOAD_SUCCESS: 'Данные загружены правильно',
+  LOAD_ERROR: 'Ошибка загрузки данных',
+  SEND_SUCCESS: 'Объявление размещено успешно!',
+  SEND_ERROR: 'Ошибка размещения объявления',
+}
+
 const AlertNode = {
   ERROR: document.querySelector('#error').content.querySelector('.error'),
   SUCCESS: document.querySelector('#success').content.querySelector('.success'),
@@ -78,4 +85,4 @@ const onSuccess = (successMessage, afterAlertClose) => () => {
   showAlert(AlertType.SUCCESS, successMessage, afterAlertClose)();
 }
 
-export { AlertType, showLoadDataAlert, showAlert, onSuccess };
+export { AlertType, Messages, showLoadDataAlert, showAlert, onSuccess };

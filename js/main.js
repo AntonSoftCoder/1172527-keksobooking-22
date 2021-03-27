@@ -1,29 +1,29 @@
-import { loadData, sendData } from './api.js';
+import { loadData, sendData, ServerUrl } from './api.js';
 import { createCard } from './card.js';
-import { ServerUrl, messages } from './constants.js';
-import { toggleForm, addSubmitHandler, resetForm, setAddress, addEventsFormHandler } from './form-ad.js';
-import { showLoadDataAlert, AlertType, showAlert, onSuccess } from './alert.js';
-import { toggleFilters, addEventsFilterHandler } from './filter.js';
-import { createPopupMarkers, filterPopupMarkers, initMap, resetMainMarker } from './map.js';
-import { getData, storeData } from './store.js';
+import { toggleForm, addSubmitHandler, resetFormHandler, setAddress, addEventsFormHandler } from './form-ad.js';
+import { showLoadDataAlert, AlertType, showAlert, onSuccess, Messages } from './alert.js';
+import { addEventsFilterHandler, isItemMatched, toggleFilters, FILTER_DELAY } from './filter.js';
+import { createPopupMarkers, rerenderPopupMarkers, initMap, resetMainMarker } from './map.js';
+import { getData, prepareData, storeData } from './store.js';
 
 toggleFilters(false)();
 toggleForm(false)();
 initMap(toggleForm(true), setAddress);
 
+const filterData = _.throttle(() => {
+  prepareData(isItemMatched);
+  rerenderPopupMarkers(createCard, getData);
+}, FILTER_DELAY, { leading: false });
+
 const onLoadDataSuccess = (cards) => {
   storeData(cards);
   createPopupMarkers(createCard)(cards);
   toggleFilters(true)();
-  addEventsFilterHandler(filterPopupMarkers(createCard, getData));
+  addEventsFilterHandler(filterData);
 }
 
-loadData(ServerUrl.GET, onLoadDataSuccess, showLoadDataAlert(messages.loadError));
+loadData(ServerUrl.GET, onLoadDataSuccess, showLoadDataAlert(Messages.LOAD_ERROR));
 
-addEventsFormHandler(resetMainMarker);
+addEventsFormHandler(resetMainMarker(setAddress));
 
-addSubmitHandler(sendData(ServerUrl.POST, onSuccess(messages.sendSuccess, resetForm(resetMainMarker)), showAlert(AlertType.ERROR, messages.sendError)));
-
-// document.querySelector('#address').addEventListener('reset', (evt) => {
-//   debugger;
-// });
+addSubmitHandler(sendData(ServerUrl.POST, onSuccess(Messages.SEND_SUCCESS, resetFormHandler(resetMainMarker(setAddress))), showAlert(AlertType.ERROR, Messages.SEND_ERROR)));

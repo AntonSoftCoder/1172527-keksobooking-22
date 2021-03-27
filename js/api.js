@@ -1,3 +1,8 @@
+const ServerUrl = {
+  GET: 'https://22.javascript.pages.academy/keksobooking/data',
+  POST: 'https://22.javascript.pages.academy/keksobooking',
+}
+
 const checkStatus = (response) => {
   if (response.ok) {
     return response;
@@ -25,4 +30,4 @@ const sendData = (serverUrl, onSuccess, onError) => (formData) => {
     .catch(onError);
 }
 
-export { loadData, sendData };
+export { loadData, sendData, ServerUrl };

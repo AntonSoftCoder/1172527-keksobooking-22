@@ -1,15 +1,46 @@
-import { apartmentTypes, ROOM_VARIANTS, GUEST_VARIANTS, FACILITIES } from './constants.js';
 import { pluralize } from './utils.js';
 
-const CARD_POPUP_NODE = document.querySelector('#card')
-  .content
-  .querySelector('.popup');
-
-const getRoomCapacity = (rooms, guests) => {
-  return `${rooms} ${pluralize(rooms, ROOM_VARIANTS)} для ${guests} ${pluralize(guests, GUEST_VARIANTS)}`;
+const apartmentTypes = {
+  flat: 'Квартира',
+  bungalow: 'Бунгало',
+  house: 'Дом',
+  palace: 'Дворец',
 };
 
-const createFeatures = (card, features) => {
+const FACILITIES = [
+  'wifi',
+  'dishwasher',
+  'parking',
+  'washer',
+  'elevator',
+  'conditioner',
+];
+
+const ROOM_VARIANTS = [
+  'комната',
+  'комнаты',
+  'комнат',
+];
+
+const GUEST_VARIANTS = [
+  'гостя',
+  'гостей',
+  'гостей',
+];
+
+const CARD_POPUP_NODE = document.querySelector('#card').content.querySelector('.popup');
+
+const getRoomCapacity = (rooms, guests) => {
+  return rooms && guests &&
+    `${rooms} ${pluralize(rooms, ROOM_VARIANTS)} для ${guests} ${pluralize(guests, GUEST_VARIANTS)}`;
+};
+
+const getTimeInfo = (checkin, checkout) => {
+  return checkin && checkout &&
+    `Заезд после ${checkin}, выезд до ${checkout}`;
+}
+
+const setOrRemoveFeatures = (card, features) => {
   const featuresContainerNode = card.querySelector('.popup__features');
   if (features && features.length > 0) {
     FACILITIES.forEach((feature) => {
@@ -25,7 +56,7 @@ const createFeatures = (card, features) => {
   }
 };
 
-const createPictures = (card, urls) => {
+const setOrRemovePictures = (card, urls) => {
   const photosContainerNode = card.querySelector('.popup__photos');
   const photoNode = photosContainerNode.querySelector('.popup__photo');
   if (urls && urls.length > 0) {
@@ -74,31 +105,19 @@ const createCard = (advert) => {
 
   setOrRemoveCardField(addressNode, address);
 
-  if (price) {
-    priceNode.childNodes[0].nodeValue = `${price} `;
-  } else {
-    priceNode.remove();
-  }
+  setOrRemoveCardField(priceNode.childNodes[0], `${price}`);
 
   setOrRemoveCardField(typeNode, apartmentTypes[type]);
 
-  if (rooms && guests) {
-    capacityNode.textContent = getRoomCapacity(rooms, guests);
-  } else {
-    capacityNode.remove();
-  }
+  setOrRemoveCardField(capacityNode, getRoomCapacity(rooms, guests));
 
-  if (checkin && checkout) {
-    timeNode.textContent = `Заезд после ${checkin}, выезд до ${checkout}`;
-  } else {
-    timeNode.remove();
-  }
+  setOrRemoveCardField(timeNode, getTimeInfo(checkin, checkout));
 
-  createFeatures(card, features);
+  setOrRemoveFeatures(card, features);
 
   setOrRemoveCardField(descriptionNode, description);
 
-  createPictures(card, photos);
+  setOrRemovePictures(card, photos);
 
   return card;
 };
