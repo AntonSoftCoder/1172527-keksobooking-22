@@ -25,20 +25,9 @@ const AlertType = {
   },
 }
 
-const showLoadDataAlert = (message) => () => {
-  const node = document.createElement('div');
-  node.style.zIndex = 1000;
-  node.style.position = 'fixed';
-  node.style.left = 0;
-  node.style.top = 0;
-  node.style.right = 0;
-  node.style.padding = '10px 3px';
-  node.style.fontSize = '30px';
-  node.style.textAlign = 'center';
-  node.style.backgroundColor = 'red';
-
-  node.textContent = message;
-
+const showLoadDataErrorAlert = () => {
+  const node = document.querySelector('#error-server').content.querySelector('.error-server');
+  node.textContent = Messages.LOAD_ERROR;
   document.body.append(node);
 
   setTimeout(() => {
@@ -55,34 +44,31 @@ const showAlert = (alertType, message, afterAlertClose) => () => {
   addPopupClosingListener(alertType, afterAlertClose);
 }
 
-const closePopupByClickHandler = (alertType, timeoutId, afterAlertClose) => () => {
-  closePopup(alertType, timeoutId, afterAlertClose);
-};
-
-const closePopupByEscapeHandler = (alertType, timeoutId, afterAlertClose) => (evt) => {
-  if (isEscEvent(evt)) {
-    closePopup(alertType, timeoutId, afterAlertClose);
-  }
-};
-
-const closePopup = (alertType, timeoutId, afterAlertClose) => {
-  alertType.popupNode.removeEventListener('click', closePopupByClickHandler(alertType, timeoutId, afterAlertClose));
-  alertType.popupNode.removeEventListener('keyup', closePopupByEscapeHandler(alertType, timeoutId, afterAlertClose));
-  alertType.popupNode.remove();
-  clearTimeout(timeoutId);
-  afterAlertClose && afterAlertClose();
-}
-
 const addPopupClosingListener = (alertType, afterAlertClose) => {
+
+  const closePopupByEscapeHandler = (evt) => {
+    if (isEscEvent(evt)) {
+      closePopupHandler();
+    }
+  };
+
+  const closePopupHandler = () => {
+    alertType.popupNode.removeEventListener('click', closePopupHandler);
+    alertType.popupNode.removeEventListener('keyup', closePopupByEscapeHandler);
+    alertType.popupNode.remove();
+    clearTimeout(timeoutId);
+    afterAlertClose && afterAlertClose();
+  }
+
   const timeoutId = setTimeout(() => {
-    closePopup(alertType, timeoutId, afterAlertClose);
+    closePopupHandler(timeoutId);
   }, 5000);
-  alertType.popupNode.addEventListener('click', closePopupByClickHandler(alertType, timeoutId, afterAlertClose));
-  document.addEventListener('keyup', closePopupByEscapeHandler(alertType, timeoutId, afterAlertClose));
+  alertType.popupNode.addEventListener('click', closePopupHandler);
+  document.addEventListener('keyup', closePopupByEscapeHandler);
 }
 
 const onSuccess = (successMessage, afterAlertClose) => () => {
   showAlert(AlertType.SUCCESS, successMessage, afterAlertClose)();
 }
 
-export { AlertType, Messages, showLoadDataAlert, showAlert, onSuccess };
+export { AlertType, Messages, showLoadDataErrorAlert, showAlert, onSuccess };
