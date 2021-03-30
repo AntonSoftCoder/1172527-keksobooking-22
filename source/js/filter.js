@@ -1,9 +1,5 @@
 import { toggleElements } from './utils.js';
 
-const MAP_FILTERS_CONTAINER = document.querySelector('.map__filters');
-
-const FILTER_DELAY = 500;
-
 const FilterType = {
   HOUSING_TYPE: 'type',
   HOUSING_PRICE_RANGE: 'price',
@@ -12,11 +8,15 @@ const FilterType = {
   HOUSING_GUESTS: 'guests',
 }
 
-const housingPriceRange = {
+const HOUSING_PRICE_RANGE = {
   low: { from: 0, to: 10000 },
   middle: { from: 10000, to: 50000 },
   high: { from: 50000, to: null },
 }
+
+const MAP_FILTERS_CONTAINER = document.querySelector('.map__filters');
+
+const FILTER_DELAY = 500;
 
 const FilterNode = {
   [FilterType.HOUSING_TYPE]: MAP_FILTERS_CONTAINER.querySelector('#housing-type'),
@@ -26,10 +26,22 @@ const FilterNode = {
   [FilterType.FEATURES]: MAP_FILTERS_CONTAINER.querySelector('#housing-features'),
 }
 
-const currentFilters = {};
+let currentFilters = {};
 
-const toggleFilters = (isShown) => () => {
+const toggleFilters = (isShown, filterData) => {
   toggleElements(MAP_FILTERS_CONTAINER, Object.values(FilterNode), isShown);
+
+  Object.entries(FilterNode).forEach(([filterType, node]) => {
+    const changeFilterHandler = (evt) => {
+      saveFilter(filterType, evt.target.value);
+      filterData();
+    }
+    if (isShown) {
+      node.addEventListener('change', changeFilterHandler);
+    } else {
+      node.removeEventListener('change', changeFilterHandler);
+    }
+  });
 }
 
 const saveFilter = (type, value) => {
@@ -53,12 +65,11 @@ const isItemMatched = (item) =>
       switch (filterType) {
         case FilterType.FEATURES:
           if (!_.isEmpty(_.difference(currentFilters[filterType], item.offer.features))) {
-          // if (_.intersection(currentFilters[filterType], item.offer.features).length !== currentFilters[filterType].length) {
             return false;
           }
           break;
         case FilterType.HOUSING_PRICE_RANGE: {
-          const { from, to } = housingPriceRange[currentFilters[filterType]];
+          const { from, to } = HOUSING_PRICE_RANGE[currentFilters[filterType]];
           if (item.offer.price < from || (to && item.offer.price > to)) {
             return false;
           }
@@ -79,14 +90,9 @@ const isItemMatched = (item) =>
     return true;
   });
 
-const addEventsFilterHandler = (filterData) => {
-
-  Object.entries(FilterNode).forEach(([filterType, node]) => {
-    node.addEventListener('change', evt => {
-      saveFilter(filterType, evt.target.value);
-      filterData();
-    });
-  });
+const resetFiltersHandler = () => {
+  currentFilters = {};
+  MAP_FILTERS_CONTAINER.reset();
 }
 
-export { toggleFilters, addEventsFilterHandler, isItemMatched, FILTER_DELAY };
+export { toggleFilters, isItemMatched, resetFiltersHandler, FILTER_DELAY };

@@ -53,14 +53,14 @@ const createMarker = (point, icon) => {
     }).addTo(map);
 };
 
-const createMap = (enableForm) => {
+const createMap = (afterInitMap) => {
   map = L.map(MAP_CANVAS_NODE)
-    .on('load', () => enableForm())
+    .on('load', afterInitMap)
     .setView(TOKYO_CENTER, MAP_ZOOM);
   createMapLayer(TILES_URL, TILES_COPYRIGHT).addTo(map);
 }
 
-const resetMainMarker = (setAddress) => () => {
+const resetMainMarker = (setAddress) => {
   mainMarker.setLatLng(TOKYO_CENTER);
   map.panTo(TOKYO_CENTER);
   setAddress(TOKYO_CENTER);
@@ -89,8 +89,8 @@ const rerenderPopupMarkers = (createCard, getCards) => {
   createPopupMarkers(createCard)(getCards());
 }
 
-const initMap = (enableForm, setAddress) => {
-  createMap(enableForm);
+const initMap = (afterInitMap, setAddress) => {
+  createMap(afterInitMap);
   createMainMarker(setAddress);
 }
 

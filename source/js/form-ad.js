@@ -6,8 +6,6 @@ const LOCATION_PRECISION = 5;
 
 const MAX_HOUSING_PRICE = 1000000;
 
-const PHOTO_SIZE = 70;
-
 const minPriceByApart = {
   flat: 1000,
   bungalow: 0,
@@ -46,11 +44,7 @@ const FormNode = {
 
 const FORM_FEATURE_NODES = FORM_CONTAINER_NODE.querySelectorAll('input[name=features]');
 const FORM_GUEST_OPTIONS = FormNode.GUESTS.querySelectorAll('option');
-
-const toggleForm = (isShown) => () => {
-  toggleElements(FORM_CONTAINER_NODE, Object.values(FormNode), isShown);
-  toggleElements(FORM_CONTAINER_NODE, FORM_FEATURE_NODES, isShown);
-}
+const IMAGE_NODE = document.querySelector('#form-photo-image').content.querySelector('img');
 
 const setAddress = (location) => {
   FormNode.ADDRESS.value = getLocationAsString(location, LOCATION_PRECISION);
@@ -64,18 +58,19 @@ const changeCheckInHandler = (evt) => {
   FormNode.CHECKIN.value = evt.target.value;
 }
 
-const changeMinPriceHandler = (priceNode, serviceType) => (evt) => {
-  priceNode.min = serviceType[evt.target.value];
-  priceNode.placeholder = serviceType[evt.target.value];
+const changeMinPriceHandler = () => {
+  const value = FormNode.TYPE.value;
+  FormNode.PRICE.min = minPriceByApart[value];
+  FormNode.PRICE.placeholder = minPriceByApart[value];
 }
 
-const validateTitleHandler = (minValue, maxValue) => (evt) => {
+const validateTitleHandler = (evt) => {
   const node = evt.target;
   const valueLength = node.value.length;
-  if (valueLength < minValue) {
-    node.setCustomValidity(`Введенный текст должен состоять минимум из ${minValue} символов. Нужно ещё ${(minValue - valueLength)} симв.`);
-  } else if (valueLength > maxValue) {
-    node.setCustomValidity(`Введенный текст должен состоять максимум из ${maxValue} символов. Удалите лишние ${(maxValue - valueLength)} симв.`);
+  if (valueLength < TITLE_LENGTH.MIN) {
+    node.setCustomValidity(`Введенный текст должен состоять минимум из ${TITLE_LENGTH.MIN} символов. Нужно ещё ${(TITLE_LENGTH.MIN - valueLength)} симв.`);
+  } else if (valueLength > TITLE_LENGTH.MAX) {
+    node.setCustomValidity(`Введенный текст должен состоять максимум из ${TITLE_LENGTH.MAX} символов. Удалите лишние ${(TITLE_LENGTH.MAX - valueLength)} симв.`);
   } else {
     node.setCustomValidity('');
   }
@@ -134,52 +129,77 @@ const showImagePreviewHandler = (imageNode) => (evt) => {
   if (matches) {
     const reader = new FileReader();
 
-    reader.addEventListener('load', () => {
+    const loadImageHandler = () => {
       imageNode.src = reader.result;
-    });
+      reader.removeEventListener('load', loadImageHandler);
+    }
+    reader.addEventListener('load', loadImageHandler);
 
     reader.readAsDataURL(file);
   }
 }
 
-const createImageNodeHandler = (photoPreviewContainer, showImagePreview) => (evt) => {
-  const imageNode = document.createElement('img');
-  imageNode.src = '';
-  imageNode.width = PHOTO_SIZE;
-  imageNode.height = PHOTO_SIZE;
-  showImagePreview(imageNode)(evt);
-  photoPreviewContainer.replaceChildren(imageNode);
+const removeImagePreview = () => {
+  FormNode.PHOTO_PREVIEW_CONTAINER.textContent = '';
+  FormNode.AVATAR_PREVIEW.src = 'img/muffin-grey.svg';
 }
 
-const addEventsFormHandler = (resetMainMarker) => {
-  FormNode.AVATAR.addEventListener('change', showImagePreviewHandler(FormNode.AVATAR_PREVIEW));
-  FormNode.PHOTO.addEventListener('change', createImageNodeHandler(FormNode.PHOTO_PREVIEW_CONTAINER, showImagePreviewHandler));
-  FormNode.CHECKIN.addEventListener('change', changeCheckOutHandler);
-  FormNode.CHECKOUT.addEventListener('change', changeCheckInHandler);
-  FormNode.TYPE.addEventListener('change', changeMinPriceHandler(FormNode.PRICE, minPriceByApart));
-  FormNode.TITLE.addEventListener('input', validateTitleHandler(TITLE_LENGTH.MIN, TITLE_LENGTH.MAX));
-  FormNode.TYPE.addEventListener('change', validatePriceHandler);
-  FormNode.PRICE.addEventListener('input', validatePriceHandler);
-  FormNode.ROOM.addEventListener('change', adjustRoomGuestsHandler);
-  FormNode.GUESTS.addEventListener('change', clearValidationHandler);
-  FormNode.RESET_BUTTON.addEventListener('click', resetFormHandler(resetMainMarker));
-  adjustRoomGuestsHandler();
+const showAvatarPreviewHandler = (evt) => {
+  showImagePreviewHandler(FormNode.AVATAR_PREVIEW)(evt);
 }
 
-const addSubmitHandler = (sendData) => {
-  FORM_CONTAINER_NODE.addEventListener('submit', (evt) => {
+const createImageNodeHandler = (evt) => {
+  const imagePhotoNode = IMAGE_NODE.cloneNode(true);
+  showImagePreviewHandler(imagePhotoNode)(evt);
+  FormNode.PHOTO_PREVIEW_CONTAINER.replaceChildren(imagePhotoNode);
+}
+
+const toggleForm = (isShown, resetForms, sendData) => {
+  toggleElements(FORM_CONTAINER_NODE, Object.values(FormNode), isShown);
+  toggleElements(FORM_CONTAINER_NODE, FORM_FEATURE_NODES, isShown);
+
+  const submitFormHandler = (evt) => {
     evt.preventDefault();
-
     const formData = new FormData(evt.target);
     sendData(formData);
-  });
+  }
+
+  if (isShown) {
+    FormNode.AVATAR.addEventListener('change', showAvatarPreviewHandler);
+    FormNode.PHOTO.addEventListener('change', createImageNodeHandler);
+    FormNode.CHECKIN.addEventListener('change', changeCheckOutHandler);
+    FormNode.CHECKOUT.addEventListener('change', changeCheckInHandler);
+    FormNode.TYPE.addEventListener('change', changeMinPriceHandler);
+    FormNode.TITLE.addEventListener('input', validateTitleHandler);
+    FormNode.TYPE.addEventListener('change', validatePriceHandler);
+    FormNode.PRICE.addEventListener('input', validatePriceHandler);
+    FormNode.ROOM.addEventListener('change', adjustRoomGuestsHandler);
+    FormNode.GUESTS.addEventListener('change', clearValidationHandler);
+    FormNode.RESET_BUTTON.addEventListener('click', resetForms);
+    FORM_CONTAINER_NODE.addEventListener('submit', submitFormHandler);
+    adjustRoomGuestsHandler();
+  } else {
+    FormNode.AVATAR.removeEventListener('change', showAvatarPreviewHandler);
+    FormNode.PHOTO.removeEventListener('change', createImageNodeHandler);
+    FormNode.CHECKIN.removeEventListener('change', changeCheckOutHandler);
+    FormNode.CHECKOUT.removeEventListener('change', changeCheckInHandler);
+    FormNode.TYPE.removeEventListener('change', changeMinPriceHandler);
+    FormNode.TITLE.removeEventListener('input', validateTitleHandler);
+    FormNode.TYPE.removeEventListener('change', validatePriceHandler);
+    FormNode.PRICE.removeEventListener('input', validatePriceHandler);
+    FormNode.ROOM.removeEventListener('change', adjustRoomGuestsHandler);
+    FormNode.GUESTS.removeEventListener('change', clearValidationHandler);
+    FormNode.RESET_BUTTON.removeEventListener('click', resetForms);
+    FORM_CONTAINER_NODE.removeEventListener('submit', submitFormHandler);
+  }
 }
 
-const resetFormHandler = (resetMainMarker) => (evt) => {
+const resetFormHandler = (evt) => {
   evt && evt.preventDefault();
   FORM_CONTAINER_NODE.reset();
   adjustRoomGuestsHandler();
-  resetMainMarker();
+  changeMinPriceHandler();
+  removeImagePreview();
 }
 
-export { toggleForm, resetFormHandler, setAddress, addEventsFormHandler, addSubmitHandler };
+export { toggleForm, resetFormHandler, setAddress };
