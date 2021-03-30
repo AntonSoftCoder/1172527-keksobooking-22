@@ -42,7 +42,7 @@ const createIcon = (url, iconSize) => {
 
 const icon = createIcon(ICON_PROPS.URL, ICON_PROPS.SIZE);
 
-const main_icon = createIcon(MAIN_ICON_PROPS.URL, MAIN_ICON_PROPS.SIZE);
+const mainIcon = createIcon(MAIN_ICON_PROPS.URL, MAIN_ICON_PROPS.SIZE);
 
 const createMarker = (point, icon) => {
   return L.marker(
@@ -67,7 +67,7 @@ const resetMainMarker = (setAddress) => {
 };
 
 const createMainMarker = (setAddress) => {
-  mainMarker = createMarker(TOKYO_CENTER, main_icon);
+  mainMarker = createMarker(TOKYO_CENTER, mainIcon);
   mainMarker.on('moveend', (evt) => { setAddress(evt.target.getLatLng()); });
   setAddress(TOKYO_CENTER);
 }

@@ -25,6 +25,10 @@ const AlertType = {
   },
 }
 
+const ALERT_CLOSE_DELAY = 500;
+
+const ALERT_POPUP_ZINDEX = 1000;
+
 const showLoadDataErrorAlert = () => {
   const node = document.querySelector('#error-server').content.querySelector('.error-server');
   node.textContent = Messages.LOAD_ERROR;
@@ -32,11 +36,11 @@ const showLoadDataErrorAlert = () => {
 
   setTimeout(() => {
     node.remove();
-  }, 5000);
+  }, ALERT_CLOSE_DELAY);
 }
 
 const showAlert = (alertType, message, afterAlertClose) => () => {
-  alertType.popupNode.style.zIndex = 1000;
+  alertType.popupNode.style.zIndex = ALERT_POPUP_ZINDEX;
   const messageNode = alertType.popupNode.querySelector(alertType.messageSelector);
   messageNode.style.backgroundColor = alertType.color;
   messageNode.textContent = message;
@@ -62,7 +66,7 @@ const addPopupClosingListener = (alertType, afterAlertClose) => {
 
   const timeoutId = setTimeout(() => {
     closePopupHandler(timeoutId);
-  }, 5000);
+  }, ALERT_CLOSE_DELAY);
   alertType.popupNode.addEventListener('click', closePopupHandler);
   document.addEventListener('keyup', closePopupByEscapeHandler);
 }
